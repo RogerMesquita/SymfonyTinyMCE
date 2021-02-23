@@ -6,6 +6,7 @@ use App\Entity\Attachment;
 use App\Entity\Post;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AttachmentManager
@@ -47,6 +48,13 @@ class AttachmentManager
             'path' => '/uploads/'.$filename
         ];
 
+    }
+
+    public function removeAttachment(?string $filename){
+        if(!empty($filename)){
+            $filesystem = new Filesystem();
+            $filesystem->remove($this->getUploadsDir().$filename);
+        }
     }
 
     public function getUploadsDir(){
