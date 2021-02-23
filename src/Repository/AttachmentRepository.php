@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Attachment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Attachment|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,34 +20,20 @@ class AttachmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Attachment::class);
     }
 
-
-
-    // /**
-    //  * @return Attachment[] Returns an array of Attachment objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAttachmentsToRemove(array $filesnames, ?int $post_id)
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $qd = $this->createQueryBuilder('a');
 
-    /*
-    public function findOneBySomeField($value): ?Attachment
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $qd->select()
+           ->where(
+                $qd->expr()->andX(
+                    $qd->expr()->eq('a.post', $post_id),
+                    $qd->expr()->notIn('a.filename', $filesnames)
+                )
+           );
+
+        return $qd->getQuery()->getResult();
     }
-    */
+
+
 }
